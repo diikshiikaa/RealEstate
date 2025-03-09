@@ -22,31 +22,46 @@ function Filter() {
         <div className="item">
           <label htmlFor="type">Type</label>
           <select name="type" id="type">
+            <option value="">any</option>
             <option value="buy">Buy</option>
             <option value="rent">Rent</option>
           </select>
         </div>
 
         <div className="item">
-          <label htmlFor="city">Location</label>
+          <label htmlFor="property">Property</label>
+          <select id="property" name="property">
+            <option value="">any</option>
+            <option value="apartment">Apartment</option>
+            <option value="house">House</option>
+            <option value="condo">Condo</option>
+            <option value="land">Land</option>
+          </select>
+        </div>
+        <div className="item">
+          <label htmlFor="minPrice">Min Price</label>
           <input
-            type="text"
-            id="city"
-            name="city"
-            placeholder="City Location"
+            type="number"
+            id="minPrice"
+            name="minPrice"
+            placeholder="any"
           />
         </div>
         <div className="item">
-          <label htmlFor="city">Location</label>
+          <label htmlFor="maxPrice">Max Price</label>
           <input
-            type="text"
-            id="city"
-            name="city"
-            placeholder="City Location"
+            type="number"
+            id="maxPrice"
+            name="maxPrice"
+            placeholder="any"
           />
         </div>
+        <div className="item">
+          <label htmlFor="bedroom">Bedroom</label>
+          <input type="number" id="bedroom" name="bedroom" placeholder="any" />
+        </div>
         <button>
-          <img src="/serach.png" alt="" />
+          <img src="/search.png" alt="" />
         </button>
       </div>
     </div>
