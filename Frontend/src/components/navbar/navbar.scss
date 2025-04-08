@@ -105,6 +105,12 @@ nav {
 
     .register {
       background-color: #fece51;
+      height: 50px;
+      font-weight: 500;
+
+      @include sm{
+        display: none;
+      }
     }
 
     .menuIcon {

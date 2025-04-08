@@ -45,8 +45,13 @@ function Register() {
             maxLength={20}
             placeholder="Username"
           />
-          <input name="email" type="text" placeholder="Email" />
-          <input name="password" type="password" placeholder="Password" />
+          <input name="email" type="email" placeholder="Email" />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            minLength={6}
+          />
           <button disabled={isLoading}>Register</button>
           {error && <span>{error}</span>}
           <Link to="/login">Do you have an account?</Link>
