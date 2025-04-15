@@ -12,15 +12,16 @@
   "dependencies": {
     "@mantine/core": "^7.17.2",
     "@mantine/hooks": "^7.17.2",
-    "@mantine/rte": "^5.10.5",
     "axios": "^1.8.3",
     "leaflet": "^1.9.4",
     "react": "^19.0.0-rc.1",
     "react-dom": "^19.0.0-rc.1",
     "react-leaflet": "^5.0.0-rc.2",
-    "react-quill": "^2.0.0",
     "react-router-dom": "^6.23.1",
-    "sass": "^1.77.1"
+    "sass": "^1.77.1",
+    "socket.io-client": "^4.8.1",
+    "timeago.js": "^4.0.2",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",
