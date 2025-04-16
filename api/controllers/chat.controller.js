@@ -69,20 +69,80 @@ export const getChat = async (req, res) => {
     res.status(500).json({ message: "Failed to get chat" });
   }
 };
+// export const addChat = async (req, res) => {
+//   const tokenUserId = req.userId;
+//   try {
+//     const newChat = await prisma.chat.create({
+//       data: {
+//         userIDs: [tokenUserId, req.body.receiverId],
+//       },
+//     });
+//     res.status(200).json(newChat);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Failed to add chat" });
+//   }
+// };
+
 export const addChat = async (req, res) => {
   const tokenUserId = req.userId;
+  const receiverId = req.body.receiverId;
+
   try {
-    const newChat = await prisma.chat.create({
-      data: {
-        userIDs: [tokenUserId, req.body.receiverId],
+    // Optional: Prevent duplicate chats
+    const existing = await prisma.chat.findFirst({
+      where: {
+        userIDs: {
+          hasEvery: [tokenUserId, receiverId],
+        },
       },
     });
-    res.status(200).json(newChat);
+
+    if (existing) {
+      const receiver = await prisma.user.findUnique({
+        where: { id: receiverId },
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+        },
+      });
+
+      return res.status(200).json({
+        ...existing,
+        messages: [],
+        receiver,
+      });
+    }
+
+    // Create new chat
+    const newChat = await prisma.chat.create({
+      data: {
+        userIDs: [tokenUserId, receiverId],
+        seenBy: [tokenUserId], // initial seen state
+      },
+    });
+
+    const receiver = await prisma.user.findUnique({
+      where: { id: receiverId },
+      select: {
+        id: true,
+        username: true,
+        avatar: true,
+      },
+    });
+
+    res.status(200).json({
+      ...newChat,
+      messages: [],
+      receiver,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to add chat" });
   }
 };
+
 export const readChat = async (req, res) => {
   const tokenUserId = req.userId;
 

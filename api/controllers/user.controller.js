@@ -129,7 +129,7 @@ export const profilePosts = async (req, res) => {
 export const getNotificationNumber = async (req, res) => {
   const tokenUserId = req.userId;
   try {
-    const number = await prisma.chat.count({
+    const chats = await prisma.chat.findMany({
       where: {
         userIDs: {
           hasSome: [tokenUserId],
@@ -140,8 +140,22 @@ export const getNotificationNumber = async (req, res) => {
           },
         },
       },
+      include: {
+        messages: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+        },
+      },
     });
-    res.status(200).json(number);
+
+    const count = chats.filter(
+      (chat) =>
+        chat.messages.length > 0 && chat.messages[0].userId !== tokenUserId
+    ).length;
+
+    res.status(200).json(count);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to get notifications" });

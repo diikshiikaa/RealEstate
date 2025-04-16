@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import "./profilePage.scss";
 import List from "../../components/list/List";
 import Chat from "../../components/chat/Chat";
@@ -6,11 +6,15 @@ import apiRequest from "../../lib/apiRequest";
 import { Await, Link, useLoaderData, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { useSearchParams } from "react-router-dom";
 
 const ProfilePage = () => {
   const data = useLoaderData();
   const { currentUser, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const autoOpenUserId = searchParams.get("chatWith");
 
   const handleLogout = async () => {
     try {
@@ -78,7 +82,12 @@ const ProfilePage = () => {
               resolve={data.chatResponse}
               errorElement={<p>Error loading chats</p>}
             >
-              {(chatResponse) => <Chat chats={chatResponse.data} />}
+              {(chatResponse) => (
+                <Chat
+                  chats={chatResponse.data}
+                  autoOpenUserId={autoOpenUserId}
+                />
+              )}
             </Await>
           </Suspense>
         </div>

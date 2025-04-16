@@ -7,11 +7,14 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import apiRequest from "../../lib/apiRequest";
+import Chat from "../../components/chat/Chat";
 
 function SinglePage() {
   const post = useLoaderData();
   const [saved, setSaved] = useState(post.isSaved);
   const { currentUser } = useContext(AuthContext);
+  const [openChat, setOpenChat] = useState(false);
+
   const navigate = useNavigate();
   const handleSave = async () => {
     setSaved((prev) => !prev);
@@ -25,6 +28,8 @@ function SinglePage() {
       setSaved((prev) => !prev);
     }
   };
+  console.log("testing user", post.user);
+
   return (
     <div className="singlePage">
       <div className="details">
@@ -144,10 +149,13 @@ function SinglePage() {
             <Map items={[post]} />
           </div>
           <div className="buttons">
-            <button>
+            <button
+              onClick={() => navigate("/profile?chatWith=" + post.user.id)}
+            >
               <img src="/chat.png" alt="" />
               Send a Message
             </button>
+
             <button
               onClick={handleSave}
               style={{ backgroundColor: saved ? "#fece51" : "white" }}
@@ -156,6 +164,11 @@ function SinglePage() {
               {saved ? "Place Saved" : "Save the Place"}
             </button>
           </div>
+          {openChat && (
+            <div className="chatBox">
+              {/* <Chat receiverId={post.user.id} /> */}
+            </div>
+          )}
         </div>
       </div>
     </div>
