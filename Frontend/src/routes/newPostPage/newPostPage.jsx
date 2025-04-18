@@ -33,6 +33,9 @@ function NewPostPage() {
           latitude: inputs.latitude,
           longitude: inputs.longitude,
           images: images,
+          availableFrom: inputs.availableFrom
+            ? new Date(inputs.availableFrom)
+            : null,
         },
         postDetail: {
           desc: value,
@@ -113,6 +116,11 @@ function NewPostPage() {
                 <option value="buy">Buy</option>
               </select>
             </div>
+            <div className="item">
+              <label htmlFor="availableFrom">Available From</label>
+              <input id="availableFrom" name="availableFrom" type="date" />
+            </div>
+
             <div className="item">
               <label htmlFor="type">Property</label>
               <select name="property">

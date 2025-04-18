@@ -45,13 +45,19 @@
           }
           .sendButton {
             width: 30%;
+            height: 50px; /* Set a fixed height for the button */
             border-radius: 5px;
             border: none;
             background-color: teal;
             color: white;
             font-weight: bold;
             cursor: pointer;
+            display: flex;
+            align-items: center; /* Centers the text vertically */
+            justify-content: center; /* Centers the text horizontally */
+            padding: 0; /* Remove any extra padding to maintain consistent height */
           }
+          
         }
       }
     }

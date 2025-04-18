@@ -16,12 +16,20 @@ export const getPosts = async (req, res) => {
         },
       },
     });
-    res.status(200).json(posts);
+
+    const now = new Date();
+    const postsWithFlag = posts.map((post) => ({
+      ...post,
+      comingSoon: post.availableFrom && new Date(post.availableFrom) > now,
+    }));
+
+    res.status(200).json(postsWithFlag);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to get posts" });
   }
 };
+
 export const getPost = async (req, res) => {
   const id = req.params.id;
 
@@ -40,6 +48,9 @@ export const getPost = async (req, res) => {
       },
     });
 
+    const isComingSoon =
+      post?.availableFrom && new Date(post.availableFrom) > new Date();
+
     const token = req.cookies?.token;
 
     if (token) {
@@ -53,15 +64,19 @@ export const getPost = async (req, res) => {
               },
             },
           });
-          return res.status(200).json({ ...post, isSaved: !!saved });
+          return res
+            .status(200)
+            .json({ ...post, isSaved: !!saved, comingSoon: isComingSoon });
         } else {
-          // If token is invalid, fall through to isSaved: false
-          return res.status(200).json({ ...post, isSaved: false });
+          return res
+            .status(200)
+            .json({ ...post, isSaved: false, comingSoon: isComingSoon });
         }
       });
     } else {
-      // No token, respond immediately
-      return res.status(200).json({ ...post, isSaved: false });
+      return res
+        .status(200)
+        .json({ ...post, isSaved: false, comingSoon: isComingSoon });
     }
   } catch (error) {
     console.log(error);
@@ -72,12 +87,15 @@ export const getPost = async (req, res) => {
 export const addPost = async (req, res) => {
   const body = req.body;
   const tokenUserId = req.userId;
+
   try {
     const newPost = await prisma.post.create({
       data: {
         ...body.postData,
+        availableFrom: body.postData.availableFrom
+          ? new Date(body.postData.availableFrom)
+          : null, // ✅ new line
         userId: tokenUserId,
-        // userId: body.postData.userId, // Use userId from request body
         postDetail: {
           create: body.postDetail,
         },
@@ -98,6 +116,7 @@ export const updatePost = async (req, res) => {
     res.status(500).json({ message: "Failed to update post" });
   }
 };
+
 export const deletePost = async (req, res) => {
   const id = req.params.id;
   const tokenUserId = req.userId;
@@ -128,10 +147,17 @@ export const getMultiplePosts = async (req, res) => {
       },
       include: {
         user: true,
-        postDetail: true, // ✅ Make sure this is included
+        postDetail: true,
       },
     });
-    res.status(200).json(posts);
+
+    const now = new Date();
+    const postsWithFlag = posts.map((post) => ({
+      ...post,
+      comingSoon: post.availableFrom && new Date(post.availableFrom) > now,
+    }));
+
+    res.status(200).json(postsWithFlag);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to fetch posts" });
