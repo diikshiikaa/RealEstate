@@ -118,3 +118,22 @@ export const deletePost = async (req, res) => {
     res.status(500).json({ message: "Failed to delete post" });
   }
 };
+
+export const getMultiplePosts = async (req, res) => {
+  const ids = req.query.ids?.split(",") || [];
+  try {
+    const posts = await prisma.post.findMany({
+      where: {
+        id: { in: ids },
+      },
+      include: {
+        user: true,
+        postDetail: true, // ✅ Make sure this is included
+      },
+    });
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch posts" });
+  }
+};

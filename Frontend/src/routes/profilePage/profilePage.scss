@@ -23,6 +23,19 @@
             flex-direction: column;
             gap: 50px;
 
+            .compareNowBtn {
+                margin-bottom: 20px;
+                background-color: #fece51;
+                cursor: pointer;
+                padding: 12px 24px;
+                border: none;
+                width: fit-content;
+               
+              }
+
+            
+              
+
             .title{
                 display: flex;
                 align-items: center;

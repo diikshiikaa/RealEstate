@@ -1,13 +1,11 @@
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Navbar from "./components/navbar/Navbar";
 import HomePage from "./routes/homePage/homePage";
 import { Layout, RequireAuth } from "./routes/layout/Layout";
 import ListPage from "./routes/listPage/listPage";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Route,
-  Link,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SinglePage from "./routes/singlePage/SinglePage";
 import ProfilePage from "./routes/profilePage/ProfilePage";
 import Login from "./routes/login/Login";
@@ -20,6 +18,7 @@ import {
   singlePageLoader,
 } from "./lib/loaders";
 import ContactPage from "./routes/contactPage/ContactPage";
+import ComparePage from "./routes/comparePage/ComparePage";
 
 function App() {
   const router = createBrowserRouter([
@@ -45,7 +44,6 @@ function App() {
           element: <SinglePage />,
           loader: singlePageLoader,
         },
-
         {
           path: "/login",
           element: <Login />,
@@ -73,11 +71,20 @@ function App() {
           path: "/add",
           element: <NewPostPage />,
         },
+        {
+          path: "/compare",
+          element: <ComparePage />,
+        },
       ],
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer position="top-center" autoClose={3000} />
+    </>
+  );
 }
 
 export default App;

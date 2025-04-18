@@ -7,6 +7,7 @@ import { Await, Link, useLoaderData, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ProfilePage = () => {
   const data = useLoaderData();
@@ -15,6 +16,27 @@ const ProfilePage = () => {
   const [searchParams] = useSearchParams();
 
   const autoOpenUserId = searchParams.get("chatWith");
+
+  // Add this to the top of the component
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const toggleCompare = (id) => {
+    id = String(id);
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    );
+  };
+
+  const handleCompare = () => {
+    if (selectedIds.length > 3) {
+      toast.error("You can only compare up to 3 properties!");
+      return;
+    }
+
+    const searchParams = new URLSearchParams();
+    searchParams.set("ids", selectedIds.join(","));
+    navigate(`/compare?${searchParams.toString()}`);
+  };
 
   const handleLogout = async () => {
     try {
@@ -70,9 +92,21 @@ const ProfilePage = () => {
               resolve={data.postResponse}
               errorElement={<p>Error loading posts</p>}
             >
-              {(postResponse) => <List posts={postResponse.data.savedPosts} />}
+              {(postResponse) => (
+                <List
+                  posts={postResponse.data.savedPosts}
+                  compareMode={true}
+                  selectedIds={selectedIds}
+                  toggleCompare={toggleCompare}
+                />
+              )}
             </Await>
           </Suspense>
+          {selectedIds.length >= 2 && (
+            <button className="compareNowBtn" onClick={handleCompare}>
+              Compare {selectedIds.length} Properties
+            </button>
+          )}
         </div>
       </div>
       <div className="chatContainer">

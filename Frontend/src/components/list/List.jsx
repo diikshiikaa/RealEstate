@@ -1,13 +1,23 @@
 import React from "react";
-import "./list.scss";
-import { listData } from "../../lib/dummyData";
 import Card from "../card/Card";
+import "./list.scss";
 
-const List = ({ posts }) => {
+const List = ({
+  posts,
+  compareMode = false,
+  selectedIds = [],
+  toggleCompare,
+}) => {
   return (
     <div className="list">
-      {posts.map((item) => (
-        <Card key={item.id} item={item} />
+      {posts.map((post) => (
+        <Card
+          key={post.id}
+          item={post}
+          compareMode={compareMode}
+          isSelected={selectedIds.includes(String(post.id))}
+          toggleCompare={toggleCompare}
+        />
       ))}
     </div>
   );

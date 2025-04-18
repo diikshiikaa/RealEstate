@@ -6,12 +6,14 @@ import {
   getPosts,
   updatePost,
   deletePost,
+  getMultiplePosts,
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
 
 router.get("/", getPosts);
-router.get("/:id", getPost);
+router.get("/multiple", getMultiplePosts); // Move this ABOVE
+router.get("/:id", getPost); // So this doesn't catch "multiple"
 router.post("/", verifyToken, addPost);
 router.put("/:id", verifyToken, updatePost);
 router.delete("/:id", verifyToken, deletePost);
