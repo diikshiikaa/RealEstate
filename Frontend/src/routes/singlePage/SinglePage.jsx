@@ -35,9 +35,36 @@ function SinglePage() {
     }
 
     try {
-      await apiRequest.post(`/posts/buy/${post.id}`);
-      alert("Payment successful!");
-      navigate("/profile");
+      // 1. Create order from backend
+      const { data } = await apiRequest.post("/payment/create-order", {
+        amount: post.price,
+      });
+
+      // 2. Open Razorpay checkout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.id,
+        name: "UrbanLiving",
+        description: "Property Purchase",
+        handler: async function (response) {
+          alert("Payment Successful!");
+          // Optional: Call your backend to mark the property as bought
+          await apiRequest.post(`/posts/buy/${post.id}`);
+          navigate("/profile");
+        },
+        prefill: {
+          name: currentUser.username,
+          email: currentUser.email,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (err) {
       console.error(err);
       alert("Payment failed.");
