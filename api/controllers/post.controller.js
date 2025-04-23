@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 export const getPosts = async (req, res) => {
   const query = req.query;
   try {
+    // Fetch posts with buyers relation to determine isBought
     const posts = await prisma.post.findMany({
       where: {
         city: query.city || undefined,
@@ -15,11 +16,16 @@ export const getPosts = async (req, res) => {
           lte: parseInt(query.maxPrice) || 10000000,
         },
       },
+      include: {
+        buyers: true, // Include buyers to check if the post is bought
+      },
     });
 
+    // Add the isBought flag based on whether there are any buyers
     const now = new Date();
     const postsWithFlag = posts.map((post) => ({
       ...post,
+      isBought: post.buyers.length > 0, // Set isBought to true if there are buyers
       comingSoon: post.availableFrom && new Date(post.availableFrom) > now,
     }));
 
@@ -32,6 +38,7 @@ export const getPosts = async (req, res) => {
 
 export const getPost = async (req, res) => {
   const id = req.params.id;
+  const token = req.cookies?.token;
 
   try {
     const post = await prisma.post.findUnique({
@@ -45,13 +52,21 @@ export const getPost = async (req, res) => {
             avatar: true,
           },
         },
+        buyers: {
+          where: {
+            userId: req.userId,
+          },
+          select: {
+            id: true,
+          },
+        },
       },
     });
 
     const isComingSoon =
       post?.availableFrom && new Date(post.availableFrom) > new Date();
 
-    const token = req.cookies?.token;
+    const isBought = post.buyers.length > 0; // If the current user has bought this post
 
     if (token) {
       jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
@@ -64,19 +79,28 @@ export const getPost = async (req, res) => {
               },
             },
           });
-          return res
-            .status(200)
-            .json({ ...post, isSaved: !!saved, comingSoon: isComingSoon });
+          return res.status(200).json({
+            ...post,
+            isSaved: !!saved,
+            comingSoon: isComingSoon,
+            isBought,
+          });
         } else {
-          return res
-            .status(200)
-            .json({ ...post, isSaved: false, comingSoon: isComingSoon });
+          return res.status(200).json({
+            ...post,
+            isSaved: false,
+            comingSoon: isComingSoon,
+            isBought,
+          });
         }
       });
     } else {
-      return res
-        .status(200)
-        .json({ ...post, isSaved: false, comingSoon: isComingSoon });
+      return res.status(200).json({
+        ...post,
+        isSaved: false,
+        comingSoon: isComingSoon,
+        isBought,
+      });
     }
   } catch (error) {
     console.log(error);
@@ -148,12 +172,14 @@ export const getMultiplePosts = async (req, res) => {
       include: {
         user: true,
         postDetail: true,
+        buyers: true, // 👈 include buyers
       },
     });
 
     const now = new Date();
     const postsWithFlag = posts.map((post) => ({
       ...post,
+      isBought: post.buyers.length > 0, // 👈 add isBought flag
       comingSoon: post.availableFrom && new Date(post.availableFrom) > now,
     }));
 
@@ -161,5 +187,34 @@ export const getMultiplePosts = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to fetch posts" });
+  }
+};
+
+export const buyPost = async (req, res) => {
+  const userId = req.userId;
+  const postId = req.params.id;
+
+  try {
+    // Check if the post exists
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // Optional: Prevent users from buying their own post
+    if (post.userId === userId) {
+      return res.status(403).json({ message: "You can't buy your own post" });
+    }
+
+    // Add record to BoughtPost
+    await prisma.boughtPost.create({
+      data: {
+        userId,
+        postId,
+      },
+    });
+
+    res.status(200).json({ message: "Post bought successfully!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to buy post" });
   }
 };

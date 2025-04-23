@@ -23,6 +23,21 @@
             border-radius: 10px;
         }
     }
+    .soldBanner {
+        position: absolute;
+        top: 10px;
+        right: -35px;
+        background-color: #e5a70b;
+        color: white;
+        font-weight: bold;
+        padding: 5px 45px;
+        transform: rotate(45deg);
+        z-index: 3;
+        font-size: 14px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+      }
+      
     .textContainer{
         flex: 3;
         display: flex;

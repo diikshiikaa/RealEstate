@@ -102,6 +102,18 @@ const ProfilePage = () => {
               )}
             </Await>
           </Suspense>
+          <div className="title">
+            <h1>Bought Properties</h1>
+          </div>
+          <Suspense fallback={<p>Loading...</p>}>
+            <Await
+              resolve={data.postResponse}
+              errorElement={<p>Error loading posts</p>}
+            >
+              {(postResponse) => <List posts={postResponse.data.boughtPosts} />}
+            </Await>
+          </Suspense>
+
           {selectedIds.length >= 2 && (
             <button className="compareNowBtn" onClick={handleCompare}>
               Compare {selectedIds.length} Properties

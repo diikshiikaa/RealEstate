@@ -108,24 +108,69 @@ export const savePost = async (req, res) => {
 
 export const profilePosts = async (req, res) => {
   const tokenUserId = req.userId;
+  const now = new Date();
+
   try {
-    const userPosts = await prisma.post.findMany({
-      where: { userId: tokenUserId },
-    });
-    const saved = await prisma.savedPost.findMany({
+    // Get userPosts with buyers info
+    const userPostsRaw = await prisma.post.findMany({
       where: { userId: tokenUserId },
       include: {
-        post: true,
+        buyers: true,
       },
     });
 
-    const savedPosts = saved.map((item) => item.post);
-    res.status(200).json({ userPosts, savedPosts });
+    const userPosts = userPostsRaw.map((post) => ({
+      ...post,
+      isBought: post.buyers.length > 0,
+      comingSoon: post.availableFrom && new Date(post.availableFrom) > now,
+    }));
+
+    // Get savedPosts with buyers info
+    const saved = await prisma.savedPost.findMany({
+      where: { userId: tokenUserId },
+      include: {
+        post: {
+          include: {
+            buyers: true,
+          },
+        },
+      },
+    });
+
+    const savedPosts = saved.map((item) => ({
+      ...item.post,
+      isBought: item.post.buyers.length > 0,
+      comingSoon:
+        item.post.availableFrom && new Date(item.post.availableFrom) > now,
+    }));
+
+    // Get boughtPosts (already bought, so isBought is true)
+    const bought = await prisma.boughtPost.findMany({
+      where: { userId: tokenUserId },
+      include: {
+        post: {
+          include: {
+            user: true,
+            postDetail: true,
+          },
+        },
+      },
+    });
+
+    const boughtPosts = bought.map((item) => ({
+      ...item.post,
+      isBought: true,
+      comingSoon:
+        item.post.availableFrom && new Date(item.post.availableFrom) > now,
+    }));
+
+    res.status(200).json({ userPosts, savedPosts, boughtPosts });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to get profile posts" });
   }
 };
+
 export const getNotificationNumber = async (req, res) => {
   const tokenUserId = req.userId;
   try {

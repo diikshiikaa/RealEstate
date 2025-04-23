@@ -23,6 +23,7 @@ function Card({
   };
 
   const availableInText = getAvailableInText();
+  console.log(item.title, "isBought:", item.isBought);
 
   return (
     <div
@@ -45,6 +46,7 @@ function Card({
       <Link to={`/${item.id}`} className="imageContainer">
         <img src={item.images[0]} alt={item.title} />
         {availableInText && <span className="soonTag">{availableInText}</span>}
+        {item.isBought && <div className="soldBanner">SOLD</div>}
       </Link>
 
       <div className="textContainer">

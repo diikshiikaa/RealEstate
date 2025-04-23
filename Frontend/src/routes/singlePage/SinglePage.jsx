@@ -28,7 +28,25 @@ function SinglePage() {
       setSaved((prev) => !prev);
     }
   };
-  console.log("testing user", post.user);
+  const handlePayment = async () => {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await apiRequest.post(`/posts/buy/${post.id}`);
+      alert("Payment successful!");
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed.");
+    }
+  };
+
+  const isOwner = currentUser?.id === post.user.id;
+  const isBought = post.isBought;
+  const disablePayment = isBought || isOwner;
 
   return (
     <div className="singlePage">
@@ -162,6 +180,18 @@ function SinglePage() {
             >
               <img src="/save.png" alt="" />
               {saved ? "Place Saved" : "Save the Place"}
+            </button>
+            <button
+              onClick={handlePayment}
+              className="payButton"
+              disabled={disablePayment}
+              style={{
+                cursor: disablePayment ? "not-allowed" : "pointer",
+                backgroundColor: disablePayment ? "#ccc" : "#fff",
+              }}
+            >
+              <img src="/pay.png" alt="pay" />
+              {isBought ? "Sold" : isOwner ? "You Own This" : "Pay Now"}
             </button>
           </div>
           {openChat && (
