@@ -23,7 +23,7 @@ function Card({
   };
 
   const availableInText = getAvailableInText();
-  console.log(item.title, "isBought:", item.isBought);
+  // console.log(item.title, "isBought:", item.isBought);
 
   return (
     <div

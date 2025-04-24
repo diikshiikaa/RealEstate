@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 
 const io = new Server({
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
   },
 });
 
@@ -43,4 +43,6 @@ io.on("connection", (socket) => {
   });
 });
 
-io.listen("4000");
+const port = process.env.PORT || 4000; // Use dynamic port or fallback to 4000
+io.listen(port);
+console.log(`Socket server running on port ${port}`);
