@@ -20,9 +20,9 @@ const Navbar = () => {
           <span>UrbanLiving</span>
         </a>
         <a href="/">Home</a>
-        <a href="/">About</a>
+        {/* <a href="/">About</a> */}
         <a href="/contact">Contact</a>
-        <a href="/">Agents</a>
+        {/* <a href="/">Agents</a> */}
       </div>
       <div className="right">
         {currentUser ? (
@@ -54,9 +54,9 @@ const Navbar = () => {
         </div>
         <div className={open ? "menu active" : "menu"}>
           <a href="/">Home</a>
-          <a href="/">About</a>
+          {/* <a href="/">About</a> */}
           <a href="/contact">Contact</a>
-          <a href="/">Agents</a>
+          {/* <a href="/">Agents</a> */}
           <a href="/login">Sign in</a>
           <a href="/register">Sign up</a>
         </div>
